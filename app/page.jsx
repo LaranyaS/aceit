@@ -12,25 +12,24 @@ import { StarsBackground } from "@/components/animate-ui/components/backgrounds/
 import { Roles } from "@/components/roles";
 import { Membership } from "@/components/Membership";
 import { FinalCTA } from "@/components/FinalCTA";
+import { syncCurrentUser } from "@/lib/syncCurrentUser";
 
-export default function Home() {
+export default async function Home() {
+  const user = await syncCurrentUser();
+
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
-      {/* Light mode background */}
       <div className="absolute inset-0 z-0 block dark:hidden">
         <HexagonBackground />
       </div>
 
-      {/* Dark mode background */}
       <div className="absolute inset-0 z-0 hidden dark:block">
         <StarsBackground />
       </div>
 
-      {/* Page content */}
       <div className="relative z-10 px-6">
         <Header />
 
-        {/* Hero Section */}
         <section className="flex min-h-[80vh] flex-col items-center justify-center text-center space-y-6">
           <SectionLabel>AI-powered interview preparation</SectionLabel>
 
@@ -55,7 +54,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Features Section */}
         <section className="relative py-28 max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <SectionLabel>Features</SectionLabel>
@@ -71,11 +69,8 @@ export default function Home() {
           </div>
 
           <Bento />
-
           <Roles />
-
-          <Membership />
-
+          <Membership currentPlan={user?.currentPlan ?? "free"} />
           <FinalCTA />
         </section>
       </div>

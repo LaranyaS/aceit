@@ -1,4 +1,4 @@
-import {ClerkProvider} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import { DM_Sans, Lora } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -27,9 +27,7 @@ export default function RootLayout({ children }) {
       <body className={`${lora.variable} ${dmSans.variable} font-sans`}>
         <ClerkProvider>
           <ThemeProvider>
-          <main className="min-h-screen">
-          {children}
-          </main>
+            <main className="min-h-screen">{children}</main>
           </ThemeProvider>
         </ClerkProvider>
       </body>

@@ -1,5 +1,9 @@
+import Link from "next/link";
+import { CalendarDays, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import CreditButton from "@/components/CreditButton";
+import { syncCurrentUser } from "@/lib/syncCurrentUser";
 import {
   SignInButton,
   SignUpButton,
@@ -7,10 +11,22 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 
-export function Header() {
+export async function Header() {
+  const user = await syncCurrentUser();
+
+  const userRole =
+    user?.role === "INTERVIEWER" ? "INTERVIEWER" : "INTERVIEWEE";
+
+  const visibleCredits =
+    user?.role === "INTERVIEWER"
+      ? user?.interviewerProfile?.creditBalance ?? 0
+      : user?.credits ?? 0;
+
   return (
     <div className="flex items-center justify-between py-6">
-      <h1 className="text-2xl font-bold">AceIt</h1>
+      <Link href="/" className="text-2xl font-bold">
+        AceIt
+      </Link>
 
       <div className="flex items-center gap-3">
         <ThemeToggle />
@@ -26,10 +42,32 @@ export function Header() {
         </Show>
 
         <Show when="signed-in">
+          {user?.role === "INTERVIEWER" && (
+            <Button variant="ghost" asChild>
+              <Link href="/dashboard">Dashboard</Link>
+            </Button>
+          )}
+
+          {user?.role === "INTERVIEWEE" && (
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/explore" className="flex items-center gap-2">
+                  <Users size={16} />
+                  <span className="hidden md:inline">Explore</span>
+                </Link>
+              </Button>
+
+              <Button variant="default" asChild>
+                <Link href="/appointments" className="flex items-center gap-2">
+                  <CalendarDays size={16} />
+                  <span className="hidden md:inline">My Appointments</span>
+                </Link>
+              </Button>
+            </>
+          )}
+
           <div className="flex items-center gap-3">
-            <div className="rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-2 text-sm font-semibold text-violet-600 dark:text-violet-300">
-              💎 28 Credits
-            </div>
+            <CreditButton role={userRole} credits={visibleCredits} />
 
             <UserButton
               appearance={{
