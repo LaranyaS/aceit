@@ -15,7 +15,11 @@ const plans = [
     button: "Get started free",
     featured: false,
     planId: null,
-    features: ["1 mock interview session", "AI feedback preview", "Basic interview history"],
+    features: [
+      "1 mock interview session",
+      "AI feedback preview",
+      "Basic interview history",
+    ],
   },
   {
     name: "Starter",
@@ -54,16 +58,22 @@ const plans = [
 
 export function Membership({ currentPlan = "free" }) {
   return (
-<section id="membership" className="relative z-10 py-28 max-w-7xl mx-auto px-6">      <div className="text-center mb-16">
+  <section
+  id="membership"
+  className="relative z-10 py-28 max-w-7xl mx-auto px-6"
+
+    >
+      <div className="text-center mb-16">
         <SectionLabel>Membership</SectionLabel>
 
         <h2 className="mt-4 text-4xl md:text-5xl font-bold">
-          Credit-based plans for <AccentTitle>every interview goal.</AccentTitle>
+          Need more credits?{" "}
+          <AccentTitle>Upgrade your plan.</AccentTitle>
         </h2>
 
         <p className="mt-6 max-w-2xl mx-auto text-lg text-muted-foreground">
-          Start free, upgrade when you need more practice, and use credits to
-          book mock interview sessions.
+          Start free, then upgrade to Starter or Pro when you need more mock
+          interviews, full AI feedback, and premium preparation tools.
         </p>
       </div>
 
@@ -73,7 +83,7 @@ export function Membership({ currentPlan = "free" }) {
 
           return (
             <div
-              key={plan.name}
+              key={plan.slug}
               className={`relative rounded-3xl border bg-card/80 p-8 backdrop-blur-xl shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
                 isActivePlan
                   ? "border-violet-600 shadow-violet-500/20"
@@ -85,6 +95,12 @@ export function Membership({ currentPlan = "free" }) {
               {isActivePlan && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-violet-600 px-4 py-1 text-xs font-bold uppercase tracking-widest text-white">
                   Active Plan
+                </div>
+              )}
+
+              {!isActivePlan && plan.featured && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-violet-600 px-4 py-1 text-xs font-bold uppercase tracking-widest text-white">
+                  Most Popular
                 </div>
               )}
 
