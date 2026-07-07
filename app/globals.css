@@ -125,3 +125,12 @@
     scroll-behavior: smooth;
   }
 }
+
+.cl-modalBackdrop,
+.cl-modalContent,
+.cl-drawerRoot,
+.cl-drawerContent,
+.cl-card,
+.cl-rootBox {
+  z-index: 9999 !important;
+}
