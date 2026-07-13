@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { SignUpButton } from "@clerk/nextjs";
+import { Show, SignUpButton } from "@clerk/nextjs";
 import { Header } from "@/components/header";
 import Bento from "@/components/bento";
 import {
@@ -44,17 +45,28 @@ export default async function Home() {
           </p>
 
           <div className="flex flex-col gap-4 sm:flex-row">
-            <SignUpButton mode="modal">
-              <Button size="lg">Start Practicing</Button>
-            </SignUpButton>
+            <Show when="signed-out">
+              <SignUpButton mode="modal">
+                <Button size="lg">Start Practicing</Button>
+              </SignUpButton>
+            </Show>
 
-            <Button size="lg" variant="outline">
-              See How It Works
+            <Show when="signed-in">
+              <Button size="lg" asChild>
+                <Link href="/onboarding">Start Practicing</Link>
+              </Button>
+            </Show>
+
+            <Button size="lg" variant="outline" asChild>
+              <Link href="#features">See How It Works</Link>
             </Button>
           </div>
         </section>
 
-        <section className="relative py-28 max-w-7xl mx-auto px-6">
+        <section
+          id="features"
+          className="relative py-28 max-w-7xl mx-auto px-6"
+        >
           <div className="text-center mb-16">
             <SectionLabel>Features</SectionLabel>
 

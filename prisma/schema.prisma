@@ -154,16 +154,14 @@ enum AvailabilityStatus {
 }
 
 enum InterviewCategory {
-  FRONTEND
-  BACKEND
-  FULLSTACK
-  DSA
-  SYSTEM_DESIGN
   BEHAVIORAL
-  DEVOPS
-  MOBILE
+  TECHNICAL
+  CASE_STUDY
+  LEADERSHIP
+  SITUATIONAL
+  PANEL
+  GENERAL
 }
-
 enum FeedbackRating {
   POOR
   AVERAGE
