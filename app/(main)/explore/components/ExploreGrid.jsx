@@ -1,149 +1,157 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import {
-  BriefcaseBusiness,
-  CalendarDays,
-  Clock3,
-  UserRound,
-} from "lucide-react";
+import { useMemo, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Search, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CATEGORIES } from "@/lib/data";
+import InterviewerCard from "./InterviewerCard";
 
-export default function ExploreGrid({ interviewers }) {
-  if (!interviewers?.length) {
-    return (
-      <div className="rounded-3xl border border-border bg-card/70 px-6 py-16 text-center shadow-lg backdrop-blur-xl">
-        <UserRound className="mx-auto h-10 w-10 text-violet-600 dark:text-violet-300" />
+export default function ExploreGrid({ interviewers = [] }) {
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [search, setSearch] = useState("");
 
-        <h2 className="mt-5 text-2xl font-bold">
-          No interview coaches available yet
-        </h2>
+  const filteredInterviewers = useMemo(() => {
+    const query = search.toLowerCase().trim();
 
-        <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          New coaches will appear here after they complete onboarding and create
-          their profiles.
-        </p>
-      </div>
-    );
-  }
+    return interviewers.filter((interviewer) => {
+      const profile = interviewer.interviewerProfile;
+
+      if (!profile) return false;
+
+      const matchesCategory =
+        activeCategory === null ||
+        profile.categories?.includes(activeCategory);
+
+      const matchesSearch =
+        !query ||
+        interviewer.name?.toLowerCase().includes(query) ||
+        profile.title?.toLowerCase().includes(query) ||
+        profile.company?.toLowerCase().includes(query) ||
+        profile.bio?.toLowerCase().includes(query) ||
+        profile.categories?.some((category) =>
+          category.toLowerCase().includes(query)
+        );
+
+      return matchesCategory && matchesSearch;
+    });
+  }, [interviewers, activeCategory, search]);
+
+  const clearFilters = () => {
+    setActiveCategory(null);
+    setSearch("");
+  };
+
+  const filtersActive = activeCategory !== null || search.trim() !== "";
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-      {interviewers.map((user) => {
-        const profile = user.interviewerProfile;
-        const nextAvailability = profile?.availabilities?.[0];
+    <div className="flex flex-col gap-8">
+      <div className="rounded-3xl border border-border bg-card/70 p-5 shadow-lg backdrop-blur-xl">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="relative w-full lg:max-w-md">
+            <Search
+              size={16}
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
 
-        return (
-          <article
-            key={user.id}
-            className="flex h-full flex-col rounded-3xl border border-border bg-card/80 p-6 shadow-lg backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-violet-500/40 hover:shadow-violet-500/10"
+            <Input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search by coach, role, company, or interview type..."
+              className="pl-10"
+            />
+          </div>
+
+          {filtersActive && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={clearFilters}
+              className="gap-2"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              Clear filters
+            </Button>
+          )}
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-2">
+          {CATEGORIES.map((category) => {
+            const active = activeCategory === category.value;
+
+            return (
+              <button
+                key={String(category.value)}
+                type="button"
+                onClick={() => setActiveCategory(category.value)}
+                className={`cursor-pointer rounded-full border px-4 py-2 text-sm transition-all duration-200 ${
+                  active
+                    ? "border-violet-500 bg-violet-500/10 text-violet-600 dark:text-violet-300"
+                    : "border-border text-muted-foreground hover:border-violet-500/40 hover:text-foreground"
+                }`}
+              >
+                {category.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          {filteredInterviewers.length === 0
+            ? "No coaches found"
+            : `${filteredInterviewers.length} coach${
+                filteredInterviewers.length === 1 ? "" : "es"
+              } found`}
+        </p>
+
+        {filtersActive && filteredInterviewers.length > 0 && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="text-sm font-medium text-violet-600 transition-colors hover:text-violet-500 dark:text-violet-300"
           >
-            <div className="flex items-start gap-4">
-              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl border border-border bg-muted">
-                {user.imageUrl ? (
-                  <Image
-                    src={user.imageUrl}
-                    alt={user.name || "Interview coach"}
-                    fill
-                    className="object-cover"
-                    sizes="56px"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center">
-                    <UserRound className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                )}
-              </div>
+            Reset
+          </button>
+        )}
+      </div>
 
-              <div className="min-w-0">
-                <h2 className="truncate text-lg font-semibold">
-                  {user.name || "AceIt Coach"}
-                </h2>
+      {filteredInterviewers.length === 0 ? (
+        <div className="rounded-3xl border border-border bg-card/70 px-6 py-16 text-center shadow-lg backdrop-blur-xl">
+          <Search className="mx-auto h-10 w-10 text-violet-600 dark:text-violet-300" />
 
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {profile?.title || "Interview Coach"}
-                </p>
+          <h2 className="mt-5 text-2xl font-bold">
+            No matching coaches found
+          </h2>
 
-                {profile?.company && (
-                  <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                    <BriefcaseBusiness className="h-4 w-4" />
-                    <span>{profile.company}</span>
-                  </div>
-                )}
-              </div>
-            </div>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
+            Try another interview type or search by a different name, role, or
+            company.
+          </p>
 
-            <p className="mt-5 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
-              {profile?.bio ||
-                "This coach has not added a profile description yet."}
-            </p>
-
-            <div className="mt-5 flex flex-wrap gap-2">
-              {profile?.categories?.slice(0, 4).map((category) => (
-                <span
-                  key={category}
-                  className="rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-xs text-violet-600 dark:text-violet-300"
-                >
-                  {category.replaceAll("_", " ")}
-                </span>
-              ))}
-            </div>
-
-            <div className="mt-6 space-y-3 border-t border-border pt-5 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Experience</span>
-                <span className="font-medium">
-                  {profile?.yearsExp
-                    ? `${profile.yearsExp}+ years`
-                    : "Not listed"}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Session cost</span>
-                <span className="font-medium">
-                  {profile?.creditRate ?? 1} credit
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between gap-3">
-                <span className="flex items-center gap-2 text-muted-foreground">
-                  <Clock3 className="h-4 w-4" />
-                  Next available
-                </span>
-
-                <span className="text-right text-xs font-medium">
-                  {nextAvailability
-                    ? new Date(nextAvailability.startTime).toLocaleString(
-                        "en-CA",
-                        {
-                          month: "short",
-                          day: "numeric",
-                          hour: "numeric",
-                          minute: "2-digit",
-                        }
-                      )
-                    : "No slots yet"}
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-auto flex gap-3 pt-6">
-              <Button variant="outline" className="flex-1" asChild>
-                <Link href={`/explore/${user.id}`}>View Profile</Link>
-              </Button>
-
-              <Button className="flex-1 gap-2" asChild>
-                <Link href={`/explore/${user.id}`}>
-                  <CalendarDays className="h-4 w-4" />
-                  Book
-                </Link>
-              </Button>
-            </div>
-          </article>
-        );
-      })}
+          {filtersActive && (
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-6"
+              onClick={clearFilters}
+            >
+              Clear filters
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {filteredInterviewers.map((interviewer) => (
+            <InterviewerCard
+              key={interviewer.id}
+              interviewer={interviewer}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

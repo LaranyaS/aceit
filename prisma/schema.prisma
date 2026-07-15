@@ -53,7 +53,7 @@ model Availability {
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
   interviewer   InterviewerProfile @relation(fields: [interviewerId], references: [id], onDelete: Cascade)
-  booking       Booking?
+  bookings      Booking[]
 
   @@index([interviewerId, startTime])
 }
@@ -62,7 +62,7 @@ model Booking {
   id             String              @id @default(uuid())
   intervieweeId  String
   interviewerId  String
-  availabilityId String?             @unique
+  availabilityId String?
   startTime      DateTime
   endTime        DateTime
   status         BookingStatus       @default(SCHEDULED)

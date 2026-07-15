@@ -3,20 +3,18 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
 
-export async function getInterviewers() {
+export async function getInterviewerById(id) {
   const clerkUser = await currentUser();
 
-  try {
-    const interviewers = await db.user.findMany({
-      where: {
-        role: "INTERVIEWER",
+  if (!clerkUser) {
+    throw new Error("You must be signed in to view a coach profile.");
+  }
 
-        // Do not show the currently signed-in interviewer their own profile.
-        ...(clerkUser && {
-          clerkUserId: {
-            not: clerkUser.id,
-          },
-        }),
+  try {
+    const interviewer = await db.user.findFirst({
+      where: {
+        id,
+        role: "INTERVIEWER",
       },
 
       include: {
@@ -32,20 +30,15 @@ export async function getInterviewers() {
               orderBy: {
                 startTime: "asc",
               },
-              take: 1,
             },
           },
         },
       },
-
-      orderBy: {
-        createdAt: "desc",
-      },
     });
 
-    return interviewers;
+    return interviewer;
   } catch (error) {
-    console.error("getInterviewers error:", error);
-    return [];
+    console.error("getInterviewerById error:", error);
+    return null;
   }
 }

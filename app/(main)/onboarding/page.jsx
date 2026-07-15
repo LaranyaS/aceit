@@ -71,10 +71,14 @@ export default function OnboardingPage() {
   });
 
   useEffect(() => {
-    if (data && !loading) {
-      router.push(role === "INTERVIEWER" ? "/dashboard" : "/explore");
-    }
-  }, [data, loading, role, router]);
+  if (data && !loading) {
+    router.push(
+      role === "INTERVIEWER"
+        ? "/dashboard/availability"
+        : "/explore"
+    );
+  }
+}, [data, loading, role, router]);
 
   const selectedRole = ONBOARDING_ROLES.find((item) => item.value === role);
 

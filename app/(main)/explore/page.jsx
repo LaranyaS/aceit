@@ -14,7 +14,7 @@ export default async function ExplorePage() {
         description="Browse experienced professionals across industries, compare coaching styles, and book mock interview sessions."
       />
 
-      <div className="mx-auto max-w-7xl px-6 py-12">
+      <div className="mx-auto max-w-7xl px-6 pb-16">
         <ExploreGrid interviewers={interviewers} />
       </div>
     </main>

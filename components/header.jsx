@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { CalendarDays, Users } from "lucide-react";
+import {
+  CalendarDays,
+  Clock3,
+  LayoutDashboard,
+  Users,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import CreditButton from "@/components/CreditButton";
@@ -14,16 +19,15 @@ import {
 export async function Header() {
   const user = await syncCurrentUser();
 
-  const userRole =
-    user?.role === "INTERVIEWER" ? "INTERVIEWER" : "INTERVIEWEE";
+  const role = user?.role ?? "UNASSIGNED";
 
   const visibleCredits =
-    user?.role === "INTERVIEWER"
+    role === "INTERVIEWER"
       ? user?.interviewerProfile?.creditBalance ?? 0
       : user?.credits ?? 0;
 
   return (
-    <div className="flex items-center justify-between py-6">
+    <header className="flex items-center justify-between py-6">
       <Link href="/" className="text-2xl font-bold">
         AceIt
       </Link>
@@ -42,32 +46,63 @@ export async function Header() {
         </Show>
 
         <Show when="signed-in">
-          {user?.role === "INTERVIEWER" && (
-            <Button variant="ghost" asChild>
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
-          )}
-
-          {user?.role === "INTERVIEWEE" && (
+          {role === "INTERVIEWER" && (
             <>
               <Button variant="ghost" asChild>
-                <Link href="/explore" className="flex items-center gap-2">
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-2"
+                >
+                  <LayoutDashboard size={16} />
+                  <span className="hidden md:inline">Dashboard</span>
+                </Link>
+              </Button>
+
+              <Button variant="outline" asChild>
+                <Link
+                  href="/dashboard/availability"
+                  className="flex items-center gap-2"
+                >
+                  <Clock3 size={16} />
+                  <span className="hidden md:inline">Availability</span>
+                </Link>
+              </Button>
+            </>
+          )}
+
+          {role === "INTERVIEWEE" && (
+            <>
+              <Button variant="ghost" asChild>
+                <Link
+                  href="/explore"
+                  className="flex items-center gap-2"
+                >
                   <Users size={16} />
                   <span className="hidden md:inline">Explore</span>
                 </Link>
               </Button>
 
               <Button variant="default" asChild>
-                <Link href="/appointments" className="flex items-center gap-2">
+                <Link
+                  href="/appointments"
+                  className="flex items-center gap-2"
+                >
                   <CalendarDays size={16} />
-                  <span className="hidden md:inline">My Appointments</span>
+                  <span className="hidden md:inline">
+                    My Appointments
+                  </span>
                 </Link>
               </Button>
             </>
           )}
 
           <div className="flex items-center gap-3">
-            <CreditButton role={userRole} credits={visibleCredits} />
+            {role !== "UNASSIGNED" && (
+              <CreditButton
+                role={role}
+                credits={visibleCredits}
+              />
+            )}
 
             <UserButton
               appearance={{
@@ -79,6 +114,6 @@ export async function Header() {
           </div>
         </Show>
       </div>
-    </div>
+    </header>
   );
 }
